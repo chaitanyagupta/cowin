@@ -199,8 +199,8 @@
 (defun beneficiary-has-appointment (beneficiary)
   (lookup :appointments beneficiary))
 
-(defun book (dates &key pincode district-name (sleep-between-calls 5) (beneficiaries (get-beneficiaries)))
-  (let ((beneficiaries (remove-if #'beneficiary-has-appointment beneficiaries)))
+(defun book (dates &key pincode district-name (sleep-between-calls 5))
+  (let ((beneficiaries (remove-if #'beneficiary-has-appointment (get-beneficiaries))))
     (format t "Beneficiaries to book for: ~S~%" (mapcar (lookup-fn :name) beneficiaries))
     (if beneficiaries
         (dolist (date dates)
@@ -215,14 +215,12 @@
                           district-name
                           (sleep-between-calls 5)
                           (sleep-between-iterations 120))
-  (let ((beneficiaries (get-beneficiaries)))
-    (handler-case
-        (loop
-          (book dates
-                :pincode pincode
-                :district-name district-name
-                :sleep-between-calls sleep-between-calls
-                :beneficiaries beneficiaries)
-          (sleep sleep-between-iterations))
-      ((or appointment-booked all-beneficiaries-booked) (c)
-        (class-name (class-of c))))))
+  (handler-case
+      (loop
+        (book dates
+              :pincode pincode
+              :district-name district-name
+              :sleep-between-calls sleep-between-calls)
+        (sleep sleep-between-iterations))
+    ((or appointment-booked all-beneficiaries-booked) (c)
+      (class-name (class-of c)))))
