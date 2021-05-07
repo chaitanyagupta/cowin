@@ -11,7 +11,14 @@ USE THIS AT YOUR OWN RISK. See the LICENSE.
 2. Get [Quicklisp](https://www.quicklisp.org/beta/)
 3. Run `sbcl --load cowin.lisp`
 
-This will land your in a Lisp REPL. From there you can do the following.
+This will land your in a Lisp REPL. First you need to switch to the `COWIN`
+package:
+
+```cl
+(in-package :cowin)
+```
+
+Then you can do the following things.
 
 ## Check for availability
 
