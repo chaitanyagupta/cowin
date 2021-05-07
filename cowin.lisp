@@ -117,15 +117,21 @@
           "Both pincode and district-name can't be given")
   (let* ((district-id (when district-name
                         (get-district-id district-name))))
-    (lookup :centers
-            (api-request (cond
-                           (district-id "/v2/appointment/sessions/public/calendarByDistrict")
-                           (pincode "/v2/appointment/sessions/public/calendarByPin"))
-                         :parameters `(("date" . ,date)
-                                       ,@(when pincode
-                                           `(("pincode" . ,pincode)))
-                                       ,@(when district-id
-                                           `(("district_id" . ,(princ-to-string district-id)))))))))
+    (flet ((api-path (trailer)
+             (with-output-to-string (out)
+               (princ "/v2/appointment/sessions/" out)
+               (when (null *token*)
+                 (princ "public/" out))
+               (princ trailer out))))
+      (lookup :centers
+              (api-request (cond
+                             (district-id (api-path "calendarByDistrict"))
+                             (pincode (api-path "calendarByPin")))
+                           :parameters `(("date" . ,date)
+                                         ,@(when pincode
+                                             `(("pincode" . ,pincode)))
+                                         ,@(when district-id
+                                             `(("district_id" . ,(princ-to-string district-id))))))))))
 
 (defun get-beneficiaries ()
   (lookup :beneficiaries (api-request "/v2/appointment/beneficiaries")))
