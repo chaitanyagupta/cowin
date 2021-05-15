@@ -24,6 +24,7 @@
 (defparameter *base-url* "https://cdn-api.co-vin.in/api")
 
 (defvar *token* nil)
+(defvar *captcha* nil)
 
 (defun cowin-url (path)
   (concatenate 'string *base-url* path))
@@ -136,14 +137,34 @@
 (defun get-beneficiaries ()
   (lookup :beneficiaries (api-request "/v2/appointment/beneficiaries")))
 
-(defun book-appointment (center-id session-id beneficiaries slot &key (dose 1))
+(defun get-captcha ()
+  (let ((string (lookup :captcha
+                        ;;(api-request "/v2/auth/getRecaptcha" :method :post)
+                        *sample-captcha-response*)))
+    (uiop/stream:with-temporary-file (:stream out
+                                      :pathname pathname
+                                      :keep t
+                                      :direction :output
+                                      :type "svg")
+      (write-string string out)
+      pathname)))
+
+(defun save-captcha ()
+  (let ((captcha-pathname (get-captcha)))
+    (format t "Captcha path is: ~A~%" captcha-pathname)
+    (format t "Enter captcha value: ")
+    (force-output)
+    (setf *captcha* (read-line))))
+
+(defun book-appointment (center-id session-id beneficiaries slot &key (dose 1) (captcha *captcha*))
   (when (atom beneficiaries)
     (setf beneficiaries (list beneficiaries)))
   (let* ((payload `((center_id . ,center-id)
                     (session_id . ,session-id)
                     (beneficiaries . ,(coerce beneficiaries 'vector))
                     (slot . ,slot)
-                    (dose . ,dose))))
+                    (dose . ,dose)
+                    (captcha . ,captcha))))
     (api-request "/v2/appointment/schedule"
                  :method :post
                  :json payload)))
