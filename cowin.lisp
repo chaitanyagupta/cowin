@@ -138,9 +138,7 @@
   (lookup :beneficiaries (api-request "/v2/appointment/beneficiaries")))
 
 (defun get-captcha ()
-  (let ((string (lookup :captcha
-                        ;;(api-request "/v2/auth/getRecaptcha" :method :post)
-                        *sample-captcha-response*)))
+  (let ((string (lookup :captcha (api-request "/v2/auth/getRecaptcha" :method :post))))
     (uiop/stream:with-temporary-file (:stream out
                                       :pathname pathname
                                       :keep t
