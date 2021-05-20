@@ -45,8 +45,20 @@ To book an appointment, first you need to validate your mobile:
 (validate-mobile "xxx")  ;; xxx here is your mobile number
 ```
 
-This will ask you to provide the OTP sent to your mobile. Once the mobile is
-validated, the easiest way to book an appointment would be to run the
+This will ask you to provide the OTP sent to your mobile.
+
+After this, you will need to solve a captcha. To solve it, do this:
+
+```cl
+(save-captcha)
+```
+
+This will download the captcha from Co-WIN's servers, save it in a local file
+and print its path. Open that file and type out the value of the captcha in a
+prompt. This should be good enough to allow you to make one booking until the
+session is valid (15 minutes at the time of writing this).
+
+Subsequently, the easiest way to start the booking process would be to run the
 `BOOK-LOOP` function:
 
 ```
