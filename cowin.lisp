@@ -170,6 +170,12 @@
 
 ;;; Booking Flow
 
+;; This allows these functions to be redeclared in another file not in the repo
+;; (say overrides.lisp). See https://bugs.launchpad.net/sbcl/+bug/1928985
+(declaim (notinline session-has-availability
+                    center-has-availability
+                    should-book-center))
+
 (defun session-has-availability (session)
   (and (plusp (lookup :available--capacity session))
        (= (lookup :min--age--limit session) 18)))
